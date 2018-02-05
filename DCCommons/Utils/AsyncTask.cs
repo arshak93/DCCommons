@@ -1,8 +1,9 @@
 using System;
+using UnityEngine;
 
 namespace DCCommons.Utils {
 	
-	public class AsyncTask {
+	public class AsyncTask : CustomYieldInstruction {
 
 		public delegate void TaskSuccessDelegate();
 		public delegate void TaskFailDelegate(Exception error);
@@ -11,6 +12,7 @@ namespace DCCommons.Utils {
 		private TaskSuccessDelegate onSuccess;
 		private TaskFailDelegate onFail;
 		private TaskCompleteDelegate onComplete;
+		private bool _keepWaiting = true;
 
 		public AsyncTask OnSuccess(TaskSuccessDelegate onSuccess) {
 			this.onSuccess = onSuccess;
@@ -34,6 +36,7 @@ namespace DCCommons.Utils {
 			if (onSuccess != null) {
 				onSuccess();
 			}
+			_keepWaiting = false;
 		}
 
 		public void Fail(Exception error) {
@@ -43,10 +46,15 @@ namespace DCCommons.Utils {
 			if (onFail != null) {
 				onFail(error);
 			}
+			_keepWaiting = false;
+		}
+
+		public override bool keepWaiting {
+			get { return _keepWaiting; }
 		}
 	}
 	
-	public class AsyncTask<T> {
+	public class AsyncTask<T> : CustomYieldInstruction {
 
 		public delegate void TaskSuccessDelegate(T result);
 		public delegate void TaskFailDelegate(Exception error);
@@ -55,6 +63,7 @@ namespace DCCommons.Utils {
 		private TaskSuccessDelegate onSuccess;
 		private TaskFailDelegate onFail;
 		private TaskCompleteDelegate onComplete;
+		private bool _keepWaiting = true;
 
 		public AsyncTask<T> OnSuccess(TaskSuccessDelegate onSuccess) {
 			this.onSuccess = onSuccess;
@@ -78,6 +87,7 @@ namespace DCCommons.Utils {
 			if (onSuccess != null) {
 				onSuccess(result);
 			}
+			_keepWaiting = false;
 		}
 
 		public void Fail(Exception error) {
@@ -87,6 +97,11 @@ namespace DCCommons.Utils {
 			if (onFail != null) {
 				onFail(error);
 			}
+			_keepWaiting = false;
+		}
+		
+		public override bool keepWaiting {
+			get { return _keepWaiting; }
 		}
 	}
 }
